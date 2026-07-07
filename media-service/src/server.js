@@ -68,7 +68,7 @@ async function startServer(){
 startServer()
 
 app.listen(PORT , () =>{
-    console.log(`Post service running on port ${PORT}`);
+    console.log(`Media service running on port ${PORT}`);
 })
 
 // unhandeled promise rejection handler
