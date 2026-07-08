@@ -5,8 +5,8 @@
   "main": "src/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev" : "nodemon src/server.js",
-    "start" : "node src/server.js"
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js"
   },
   "dependencies": {
     "amqplib": "^0.10.9",
@@ -17,7 +17,7 @@
     "ioredis": "^5.10.0",
     "joi": "^18.0.2",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.2.3",
+    "mongoose": "^8.16.5",
     "winston": "^3.19.0"
   },
   "devDependencies": {

@@ -22,7 +22,7 @@
     "ioredis": "^5.10.0",
     "joi": "^18.0.2",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.2.3",
+    "mongoose": "^8.16.5",
     "multer": "^2.1.0",
     "winston": "^3.19.0"
   },
