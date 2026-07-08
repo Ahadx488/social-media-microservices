@@ -1,6 +1,6 @@
 const express = require('express')
 
-const {registerUser , loginUser , refreshTokenUser , logoutUser} = require('../controllers/idnetity-controller')
+const {registerUser , loginUser , refreshTokenUser , logoutUser} = require('../controllers/identity-controller')
 
 const router = express.Router();
 
