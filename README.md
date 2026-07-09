@@ -72,7 +72,6 @@ It was built to go deep on questions that don't come up in a monolith: *How do s
 *Client requests flow top-down through the Gateway. Post-service writes flow sideways into RabbitMQ, which Media and Search consume independently — so a slow Search index update never blocks a post being created. Redis sits underneath the Gateway, Identity, and Post services for rate limiting and caching (Media has no Redis usage; Search has it scaffolded but not yet wired in).*
 
 <details>
-<summary>📊 Detailed diagram (Mermaid — renders automatically on GitHub)</summary>
 
 ```mermaid
 graph TD
