@@ -1,3 +1,5 @@
+::: {align="center"}
+
 # 🌐 Distributed Social Media Backend
 
 A production-style, event-driven microservices backend for a social
