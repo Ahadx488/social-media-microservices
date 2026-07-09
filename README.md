@@ -1,8 +1,18 @@
+<<<<<<< HEAD
 <div align="center">
 
 # 🌐 Distributed Social Media Backend
 
 A production-style, event-driven microservices backend for a social media platform — built to explore real distributed-systems problems: service decoupling, caching, rate limiting, and fault isolation.
+=======
+::: {align="center"}
+
+# 🌐 Distributed Social Media Backend
+
+A production-style, event-driven microservices backend for a social
+media platform --- built to explore real distributed-systems problems:
+service decoupling, caching, rate limiting, and fault isolation.
+>>>>>>> acfe2fc (update Readme.md)
 
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
 ![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
@@ -10,6 +20,7 @@ A production-style, event-driven microservices backend for a social media platfo
 ![RabbitMQ](https://img.shields.io/badge/RabbitMQ-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white)
 ![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+<<<<<<< HEAD
 ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
 ![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
@@ -82,6 +93,93 @@ graph TD
     Gateway -->|JWT verify + proxy| Media[Media Service]
     Gateway -->|JWT verify + proxy| Search[Search Service]
 
+=======
+![GitHub
+Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
+![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
+:::
+
+---
+
+## 📖 Overview
+
+This project implements a social media backend as **4 independently
+deployable microservices** behind a single **API Gateway**,
+communicating asynchronously via **RabbitMQ** and using **Redis** for
+both caching and distributed rate limiting. Each service owns its own
+MongoDB database (database-per-service pattern), so services can be
+developed, deployed, and scaled independently.
+
+It was built to go deep on questions that don't come up in a monolith:
+_How do services talk to each other without being tightly coupled? How
+do you rate-limit fairly across multiple instances? How do you cache
+safely when writes happen in a different service than reads?_
+
+---
+
+## 🏗️ Architecture
+
+                                  ┌────────────┐
+                                  │   Client   │
+                                  └─────┬──────┘
+                                        │  HTTP
+                                  ┌─────▼──────┐
+                                  │ API Gateway│◄──────────┐
+                                  │  (JWT auth)│           │
+                                  └─────┬──────┘           │
+                  ┌──────────────┬─────┴──────┬──────────────┐
+                  │              │             │              │
+            ┌─────▼────┐   ┌─────▼────┐  ┌─────▼────┐   ┌─────▼────┐
+            │ Identity │   │   Post   │  │  Media   │   │  Search  │
+            │ Service  │◄──┼──────────┼──┘          │   │          │
+            └─────┬────┘   └─────┬────┘  └─────┬────┘   └─────┬────┘
+                  │              │             │              │
+            ┌─────▼────┐   ┌─────▼────┐  ┌─────▼────┐   ┌─────▼────┐
+            │ MongoDB  │   │ MongoDB  │  │ MongoDB  │   │ MongoDB  │
+            │(identity)│   │  (post)  │  │ (media)  │   │ (search) │
+            └──────────┘   └─────┬────┘  └──────────┘   └──────────┘
+                                  │ publish
+                            ┌─────▼─────┐
+                            │ RabbitMQ  │
+                            │ (Exchange)│
+                            └─────┬─────┘
+                            consume│consume
+                           ┌───────┴───────┐
+                      ┌────▼────┐     ┌────▼────┐
+                      │  Media  │     │ Search  │
+                      │ Service │     │ Service │
+                      └─────────┘     └─────────┘
+
+                            ┌───────────────┐
+                            │     Redis     │
+                            │ (Cache + Rate │
+                            │    Limiting)  │
+                            └───────┬───────┘
+                        used by:    │
+                  Gateway • Identity • Post
+
+_Client requests flow top-down through the Gateway. Post-service writes
+flow sideways into RabbitMQ, which Media and Search consume
+independently --- so a slow Search index update never blocks a post
+being created. Redis sits underneath the Gateway, Identity, and Post
+services for rate limiting and caching (Media has no Redis usage; Search
+has it scaffolded but not yet wired in)._
+
+```{=html}
+<details>
+```
+
+```mermaid
+graph TD
+    Client[Client / Postman] -->|HTTP| Gateway[API Gateway :3000]
+
+    Gateway -->|JWT verify + proxy| Identity[Identity Service]
+    Gateway -->|JWT verify + proxy| Post[Post Service]
+    Gateway -->|JWT verify + proxy| Media[Media Service]
+    Gateway -->|JWT verify + proxy| Search[Search Service]
+
+>>>>>>> acfe2fc (update Readme.md)
     Identity -->|users, refresh tokens| MongoIdentity[(MongoDB - Identity)]
     Post -->|posts| MongoPost[(MongoDB - Post)]
     Media -->|media metadata| MongoMedia[(MongoDB - Media)]
@@ -98,14 +196,28 @@ graph TD
     Post <-->|cache: feed & posts| Redis
 ```
 
+<<<<<<< HEAD
 </details>
 
 **Request flow:** every request enters through the API Gateway, which verifies the JWT and proxies to the correct downstream service. **Event flow:** when a post is created or deleted, the Post service publishes an event to a RabbitMQ exchange instead of calling Media/Search directly — those services consume the event independently, so a slow or down Search service never blocks post creation.
+=======
+```{=html}
+</details>
+```
+
+**Request flow:** every request enters through the API Gateway, which
+verifies the JWT and proxies to the correct downstream service. **Event
+flow:** when a post is created or deleted, the Post service publishes an
+event to a RabbitMQ exchange instead of calling Media/Search directly
+--- those services consume the event independently, so a slow or down
+Search service never blocks post creation.
+>>>>>>> acfe2fc (update Readme.md)
 
 ---
 
 ## ⚙️ Tech Stack
 
+<<<<<<< HEAD
 | Layer | Technology |
 |---|---|
 | Runtime | Node.js, Express.js |
@@ -116,11 +228,42 @@ graph TD
 | Media Storage | Cloudinary |
 | Containerization | Docker, Docker Compose |
 | CI/CD | GitHub Actions |
+=======
+---
+
+Layer Technology
+
+---
+
+Runtime Node.js, Express.js
+
+Database MongoDB (Mongoose) --- one database
+per service
+
+Messaging RabbitMQ (publish/subscribe,
+exchange-based routing)
+
+Caching & Rate Limiting Redis (`ioredis`,
+`rate-limit-redis`,
+`rate-limiter-flexible`)
+
+Auth JWT (access + refresh tokens,
+refresh-token rotation)
+
+Media Storage Cloudinary
+
+Containerization Docker, Docker Compose
+
+CI/CD GitHub Actions
+
+---
+>>>>>>> acfe2fc (update Readme.md)
 
 ---
 
 ## 🧩 Services
 
+<<<<<<< HEAD
 | Service | Responsibility |
 |---|---|
 | **API Gateway** | Single entry point, JWT verification, request proxying, global Redis-backed rate limiting |
@@ -128,21 +271,71 @@ graph TD
 | **Post Service** | Create/read/delete posts, Redis-cached reads, publishes post lifecycle events |
 | **Media Service** | Media upload to Cloudinary, consumes post-deletion events to clean up orphaned media |
 | **Search Service** | Consumes post events to keep a search index in sync |
+=======
+---
+
+Service Responsibility
+
+---
+
+**API Gateway** Single entry point, JWT
+verification, request proxying,
+global Redis-backed rate limiting
+
+**Identity Service** Registration, login, logout,
+refresh-token rotation, IP-based
+rate limiting on sensitive routes
+
+**Post Service** Create/read/delete posts,
+Redis-cached reads, publishes post
+lifecycle events
+
+**Media Service** Media upload to Cloudinary,
+consumes post-deletion events to
+clean up orphaned media
+
+**Search Service** Consumes post events to keep a
+search index in sync
+
+---
+>>>>>>> acfe2fc (update Readme.md)
 
 ---
 
 ## 🔑 Key Design Decisions
 
+<<<<<<< HEAD
 - **Event-driven decoupling** — Post service never calls Media/Search directly; it publishes events to RabbitMQ and lets consumers react independently. A downstream service being slow or offline doesn't block post creation.
 - **Cache-aside pattern with invalidation** — Post reads are cached in Redis (5-min TTL on feed pages, 1-hour on individual posts); the cache is explicitly invalidated on writes to avoid serving stale data.
 - **Distributed rate limiting** — Rate limit counters live in Redis rather than in-memory, so limits are enforced correctly even if a service runs multiple instances. Registration has a stricter, dedicated limiter to reduce abuse.
 - **Refresh-token rotation** — Every refresh call invalidates the old refresh token and issues a new one, limiting the blast radius of a leaked token.
 - **Database-per-service** — Each service owns its own MongoDB database and connection string, avoiding cross-service coupling at the data layer.
+=======
+- **Event-driven decoupling** --- Post service never calls
+  Media/Search directly; it publishes events to RabbitMQ and lets
+  consumers react independently. A downstream service being slow or
+  offline doesn't block post creation.
+- **Cache-aside pattern with invalidation** --- Post reads are cached
+  in Redis (5-min TTL on feed pages, 1-hour on individual posts); the
+  cache is explicitly invalidated on writes to avoid serving stale
+  data.
+- **Distributed rate limiting** --- Rate limit counters live in Redis
+  rather than in-memory, so limits are enforced correctly even if a
+  service runs multiple instances. Registration has a stricter,
+  dedicated limiter to reduce abuse.
+- **Refresh-token rotation** --- Every refresh call invalidates the
+  old refresh token and issues a new one, limiting the blast radius of
+  a leaked token.
+- **Database-per-service** --- Each service owns its own MongoDB
+  database and connection string, avoiding cross-service coupling at
+  the data layer.
+>>>>>>> acfe2fc (update Readme.md)
 
 ---
 
 ## 📡 API Endpoints
 
+<<<<<<< HEAD
 <details>
 <summary><strong>Identity Service</strong> — <code>/api/auth</code></summary>
 
@@ -185,6 +378,142 @@ graph TD
 | GET | `/posts` | Search posts by indexed content |
 
 </details>
+=======
+```{=html}
+<details>
+```
+
+```{=html}
+<summary>
+```
+
+`<strong>`{=html}Identity Service`</strong>`{=html} ---
+`<code>`{=html}/api/auth`</code>`{=html}
+
+```{=html}
+</summary>
+```
+
+---
+
+Method Endpoint Description
+
+---
+
+POST `/register` Register a new user
+(rate-limited: 50 req /
+15 min per IP)
+
+POST `/login` Authenticate and
+receive access +
+refresh tokens
+
+POST `/refresh-token` Rotate refresh token,
+issue new access token
+
+POST `/logout` Invalidate refresh
+token
+
+---
+
+```{=html}
+</details>
+```
+
+```{=html}
+<details>
+```
+
+```{=html}
+<summary>
+```
+
+`<strong>`{=html}Post Service`</strong>`{=html} ---
+`<code>`{=html}/api/posts`</code>`{=html}
+
+```{=html}
+</summary>
+```
+
+---
+
+Method Endpoint Description
+
+---
+
+POST `/create-post` Create a new post
+(publishes
+`post.created` event)
+
+GET `/all-posts` Paginated feed
+(Redis-cached, 5-min
+TTL)
+
+GET `/:id` Single post by ID
+(Redis-cached, 1-hour
+TTL)
+
+DELETE `/:id` Delete a post
+(publishes
+`post.deleted` event)
+
+---
+
+```{=html}
+</details>
+```
+
+```{=html}
+<details>
+```
+
+```{=html}
+<summary>
+```
+
+`<strong>`{=html}Media Service`</strong>`{=html} ---
+`<code>`{=html}/api/media`</code>`{=html}
+
+```{=html}
+</summary>
+```
+
+Method Endpoint Description
+
+---
+
+POST `/upload` Upload media to Cloudinary
+GET `/get` Retrieve media metadata
+
+```{=html}
+</details>
+```
+
+```{=html}
+<details>
+```
+
+```{=html}
+<summary>
+```
+
+`<strong>`{=html}Search Service`</strong>`{=html} ---
+`<code>`{=html}/api/search`</code>`{=html}
+
+```{=html}
+</summary>
+```
+
+Method Endpoint Description
+
+---
+
+GET `/posts` Search posts by indexed content
+
+```{=html}
+</details>
+```
+>>>>>>> acfe2fc (update Readme.md)
 
 ---
 
@@ -195,6 +524,13 @@ graph TD
 - MongoDB Atlas connection string (or local MongoDB)
 - Cloudinary account (for media uploads)
 
+<<<<<<< HEAD
+=======
+- Docker & Docker Compose
+- MongoDB Atlas connection string (or local MongoDB)
+- Cloudinary account (for media uploads)
+
+>>>>>>> acfe2fc (update Readme.md)
 ### Setup
 
 ```bash
@@ -217,12 +553,18 @@ docker-compose up -d --build
 docker-compose ps
 ```
 
+<<<<<<< HEAD
 The API Gateway will be available at `http://localhost:3000`. Redis and RabbitMQ run as internal containers and don't need separate setup.
+=======
+The API Gateway will be available at `http://localhost:3000`. Redis and
+RabbitMQ run as internal containers and don't need separate setup.
+>>>>>>> acfe2fc (update Readme.md)
 
 ---
 
 ## 🧪 Testing & Verification
 
+<<<<<<< HEAD
 This project was tested locally using **Postman** for API requests and **MongoDB Atlas** for verifying persisted data across services.
 
 **Redis caching impact (measured in Postman):**
@@ -231,6 +573,20 @@ This project was tested locally using **Postman** for API requests and **MongoDB
 |---|---|---|
 | Avg. response time (`/all-posts`) | ~230ms | <100ms |
 
+=======
+This project was tested locally using **Postman** for API requests and
+**MongoDB Atlas** for verifying persisted data across services.
+
+**Redis caching impact (measured in Postman):**
+
+Metric Without Redis With Redis
+
+---
+
+Avg. response time (`/all-posts`) \~230ms \<100ms
+
+```{=html}
+>>>>>>> acfe2fc (update Readme.md)
 <!--
 📸 SCREENSHOT PLACEHOLDER: Postman
 Add screenshots here showing:
@@ -240,6 +596,7 @@ Example:
 ![Postman - Login Request](./docs/screenshots/postman-login.png)
 ![Postman - Cache Latency Comparison](./docs/screenshots/postman-cache-latency.png)
 -->
+<<<<<<< HEAD
 
 <!--
 📸 SCREENSHOT PLACEHOLDER: MongoDB Atlas
@@ -296,3 +653,120 @@ social-media-microservices/
 🔗 [GitHub — Ahadx488](https://github.com/Ahadx488)
 
 </div>
+=======
+```
+
+```{=html}
+<!--
+📸 SCREENSHOT PLACEHOLDER: MongoDB Atlas
+Add screenshots here showing:
+  - Each service's database/collection (e.g., identity-db.users, post-db.posts)
+  - A sample document to show schema in practice
+Example:
+![MongoDB Atlas - Post Collection](./docs/screenshots/atlas-post-collection.png)
+-->
+```
+
+---
+
+## 📸 Screenshots
+
+### 🏗️ Architecture
+
+![Architecture](./ScreenShots/Architecture_diagram.png)
+
+### 🔐 Identity Service
+
+#### Register New User
+
+![Register](./ScreenShots/new_user_registration.png)
+
+#### Existing User Registration
+
+![Existing User](./ScreenShots/existing_user_registration.png)
+
+#### Login
+
+![Login](./ScreenShots/login_user.png)
+
+### 📝 Post Service
+
+#### Create Post
+
+![Create Post](./ScreenShots/create_post.png)
+
+#### Fetch All Posts
+
+![Fetch Posts](./ScreenShots/fetch_all_post.png)
+
+#### Search Posts
+
+![Search Posts](./ScreenShots/search_post.png)
+
+#### Delete Post
+
+![Delete Post](./ScreenShots/delete_post.png)
+
+### 🖼️ Media Service
+
+#### Upload Image to Cloudinary
+
+![Upload](./ScreenShots/upload_to_cloudinary.png)
+
+#### Fetch Uploaded Media
+
+![Media](./ScreenShots/get_uploaded_media_cloudinary.png)
+
+### 🗄️ Database per Service
+
+![MongoDB](./ScreenShots/db_per_service.png)
+
+## 🔄 CI/CD
+
+A GitHub Actions workflow (`.github/workflows/deploy.yml`) automates
+building and pushing Docker images on every push, and deploys via SSH to
+a VPS running Docker Compose.
+
+```{=html}
+<!--
+📸 SCREENSHOT PLACEHOLDER: GitHub Actions
+Add a screenshot of a successful workflow run here.
+Example:
+![GitHub Actions - Successful Run](./docs/screenshots/gh-actions-run.png)
+-->
+```
+
+---
+
+## 📂 Project Structure
+
+    social-media-microservices/
+    ├── api-gateway/          # Entry point, JWT verification, proxying, rate limiting
+    ├── identity-services/     # Auth: register, login, refresh, logout
+    ├── post-service/          # Post CRUD, Redis caching, event publishing
+    ├── media-service/         # Cloudinary uploads, event consumption
+    ├── search-service/        # Search index, event consumption
+    ├── .github/workflows/     # CI/CD pipeline
+    └── docker-compose.yml     # Orchestrates all services + Redis + RabbitMQ
+
+---
+
+## 🛣️ Future Enhancements
+
+- [ ] Redis caching in Search service (currently scaffolded, not yet
+      implemented)
+- [ ] Notification service for real-time post/interaction alerts
+- [ ] Kubernetes deployment for production-grade orchestration
+- [ ] Centralized service discovery and health monitoring
+
+---
+
+## 👤 Author
+
+**Momin Abdul Ahad** 📧 amomin4848@gmail.com 🔗 [GitHub ---
+Ahadx488](https://github.com/Ahadx488)
+
+```{=html}
+</div>
+```
+>>>>>>> acfe2fc (update Readme.md)
