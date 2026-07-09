@@ -28,6 +28,52 @@ It was built to go deep on questions that don't come up in a monolith: *How do s
 
 ## 🏗️ Architecture
 
+```
+                              ┌────────────┐
+                              │   Client   │
+                              └─────┬──────┘
+                                    │  HTTP
+                              ┌─────▼──────┐
+                              │ API Gateway│◄──────────┐
+                              │  (JWT auth)│           │
+                              └─────┬──────┘           │
+              ┌──────────────┬─────┴──────┬──────────────┐
+              │              │             │              │
+        ┌─────▼────┐   ┌─────▼────┐  ┌─────▼────┐   ┌─────▼────┐
+        │ Identity │   │   Post   │  │  Media   │   │  Search  │
+        │ Service  │◄──┼──────────┼──┘          │   │          │
+        └─────┬────┘   └─────┬────┘  └─────┬────┘   └─────┬────┘
+              │              │             │              │
+        ┌─────▼────┐   ┌─────▼────┐  ┌─────▼────┐   ┌─────▼────┐
+        │ MongoDB  │   │ MongoDB  │  │ MongoDB  │   │ MongoDB  │
+        │(identity)│   │  (post)  │  │ (media)  │   │ (search) │
+        └──────────┘   └─────┬────┘  └──────────┘   └──────────┘
+                              │ publish
+                        ┌─────▼─────┐
+                        │ RabbitMQ  │
+                        │ (Exchange)│
+                        └─────┬─────┘
+                        consume│consume
+                       ┌───────┴───────┐
+                  ┌────▼────┐     ┌────▼────┐
+                  │  Media  │     │ Search  │
+                  │ Service │     │ Service │
+                  └─────────┘     └─────────┘
+
+                        ┌───────────────┐
+                        │     Redis     │
+                        │ (Cache + Rate │
+                        │    Limiting)  │
+                        └───────┬───────┘
+                    used by:    │
+              Gateway • Identity • Post
+```
+
+*Client requests flow top-down through the Gateway. Post-service writes flow sideways into RabbitMQ, which Media and Search consume independently — so a slow Search index update never blocks a post being created. Redis sits underneath the Gateway, Identity, and Post services for rate limiting and caching (Media has no Redis usage; Search has it scaffolded but not yet wired in).*
+
+<details>
+<summary>📊 Detailed diagram (Mermaid — renders automatically on GitHub)</summary>
+
 ```mermaid
 graph TD
     Client[Client / Postman] -->|HTTP| Gateway[API Gateway :3000]
@@ -52,6 +98,8 @@ graph TD
     Identity <-->|rate limit store| Redis
     Post <-->|cache: feed & posts| Redis
 ```
+
+</details>
 
 **Request flow:** every request enters through the API Gateway, which verifies the JWT and proxies to the correct downstream service. **Event flow:** when a post is created or deleted, the Post service publishes an event to a RabbitMQ exchange instead of calling Media/Search directly — those services consume the event independently, so a slow or down Search service never blocks post creation.
 
