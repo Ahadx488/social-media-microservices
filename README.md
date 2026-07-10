@@ -33,7 +33,7 @@ It was built to go deep on questions that don't come up in a monolith: _How do s
 </div>
 
 <details>
-<summary>📋 Text-based version (renders in any viewer)</summary>
+<summary>📋 Text-based version</summary>
 
 ```
                               ┌────────────┐
@@ -81,7 +81,7 @@ _Client requests flow top-down through the Gateway. Post-service writes flow sid
 </details>
 
 <details>
-<summary>📊 Detailed diagram (Mermaid — renders automatically on GitHub)</summary>
+<summary>📊 Detailed diagram </summary>
 
 ```mermaid
 graph TD
@@ -99,9 +99,9 @@ graph TD
 
     Media -->|uploads| Cloudinary[(Cloudinary CDN)]
 
-    Post -.publish post.created / post.deleted.-> RabbitMQ{{RabbitMQ Exchange}}
-    RabbitMQ -.consume.-> Media
-    RabbitMQ -.consume.-> Search
+    Post -.->|publish: post.created / post.deleted| RabbitMQ{{RabbitMQ Exchange}}
+    RabbitMQ -.->|consume| Media
+    RabbitMQ -.->|consume| Search
 
     Gateway <-->|rate limit store| Redis[(Redis)]
     Identity <-->|rate limit store| Redis
